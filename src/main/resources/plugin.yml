@@ -1,0 +1,7 @@
+name: 'FlightControl'
+version: '${project.version}'
+description: '${project.description}'
+api-version: '${spigot.api.version}'
+main: 'no.nouish.flightcontrol.FlightControl'
+website: '${project.url}'
+author: 'nouish'

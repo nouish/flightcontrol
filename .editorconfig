@@ -1,0 +1,19 @@
+root = true
+
+[*]
+charset = utf-8
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.java]
+max_line_length = 120
+ij_continuation_indent_size = 4
+ij_java_block_brace_style = next_line
+ij_java_class_brace_style = next_line
+ij_java_method_brace_style = next_line
+ij_java_catch_on_new_line = true
+ij_java_else_on_new_line = true
+ij_java_align_multiline_parameters = false
+ij_java_imports_layout = javax.**, java.**, |, *, |, lombok.**, |, $*
