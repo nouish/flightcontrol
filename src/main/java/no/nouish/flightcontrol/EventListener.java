@@ -143,17 +143,17 @@ final class EventListener implements Listener
         String wait;
         Duration timeToWait = Duration.between(now, when);
 
-        if (timeToWait.toDays() >= 7)
+        if (timeToWait.toDays() >= 6)
         {
           wait = timeToWait.toDays() + " days";
         }
         else
         {
-          wait = when.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+          wait = "until " + when.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
               + " at " + TIME_FORMATTER.format(when) + " UTC";
         }
 
-        player.sendMessage("§4You must wait until " + wait + " to take any more elytra.");
+        player.sendMessage("§4You must wait " + wait + " to take any more elytra.");
         return;
       }
     }
