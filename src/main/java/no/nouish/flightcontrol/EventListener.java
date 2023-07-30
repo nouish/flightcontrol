@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -183,6 +182,12 @@ final class EventListener implements Listener
   @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
   void onPlayerInteractEntity(PlayerInteractEntityEvent event)
   {
+    Location location = event.getRightClicked().getLocation();
+    if (!isInTheEnd(location))
+    {
+      return;
+    }
+
     ItemFrame itemFrame = safeToItemFrame(event.getRightClicked());
     if (itemFrame == null)
     {
