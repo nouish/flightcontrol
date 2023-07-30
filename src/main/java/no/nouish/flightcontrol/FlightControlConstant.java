@@ -18,25 +18,34 @@
  */
 package no.nouish.flightcontrol;
 
+import java.util.UUID;
+
 import org.bukkit.NamespacedKey;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 final class FlightControlConstant
 {
-  static final JavaPlugin PLUGIN = FlightControl.getProvidingPlugin(FlightControl.class);
+  // Temporary, only to be used on TorrentSMP
+  static final UUID DEVELOPER_UUID = UUID.fromString("fa8d60a7-9645-4a9f-b74d-173966174739");
 
   // Current time period stuff
 
-  static final NamespacedKey UNIX_PERIOD = new NamespacedKey(PLUGIN, "unix_period");
-  static final NamespacedKey COUNT_PERIOD = new NamespacedKey(PLUGIN, "count_period");
-  static final NamespacedKey COUNT_TOTAL = new NamespacedKey(PLUGIN, "count_total");
+  static final NamespacedKey UNIX_PERIOD = createNamespacedKey("unix_period");
+  static final NamespacedKey COUNT_PERIOD = createNamespacedKey("count_period");
+  static final NamespacedKey COUNT_TOTAL = createNamespacedKey("count_total");
 
   // Other
 
   /**
    * Used to identify whether an item frame was placed by a player.
    */
-  static final NamespacedKey PLACED_BY = new NamespacedKey(PLUGIN, "placed_by");
+  static final NamespacedKey PLACED_BY = createNamespacedKey("placed_by");
+
+  @NotNull
+  private static NamespacedKey createNamespacedKey(@NotNull String key)
+  {
+    return new NamespacedKey(FlightControl.getInstance(), key);
+  }
 
   private FlightControlConstant() {}
 }

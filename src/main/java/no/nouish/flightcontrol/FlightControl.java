@@ -29,12 +29,19 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 @Log4j2(topic = "FlightControl")
 public final class FlightControl extends JavaPlugin
 {
+  static FlightControl getInstance()
+  {
+    return (FlightControl) FlightControl.getProvidingPlugin(FlightControl.class);
+  }
+
   @Getter
   private final Configuration configuration = new Configuration(this);
 
@@ -50,6 +57,22 @@ public final class FlightControl extends JavaPlugin
   {
     PluginManager pluginManager = getServer().getPluginManager();
     pluginManager.registerEvents(new EventListener(this), this);
+
+    FlightControlCommand flightControlCommand = new FlightControlCommand(this);
+    PluginCommand pluginCommand = safeGetCommand("flightcontrol");
+    pluginCommand.setExecutor(flightControlCommand);
+    pluginCommand.setTabCompleter(flightControlCommand);
+  }
+
+  @NotNull
+  private PluginCommand safeGetCommand(@NotNull String name)
+  {
+    PluginCommand command = getCommand(name);
+    if (command == null)
+    {
+      throw new IllegalStateException("Undefined command '" + name + "'");
+    }
+    return command;
   }
 
   private void setupLogging()

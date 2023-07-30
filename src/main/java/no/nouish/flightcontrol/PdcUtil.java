@@ -1,0 +1,137 @@
+/*
+ * This file is part of FlightControl, a plugin for Spigot servers.
+ *
+ * Copyright (C) 2023  Erik Eide
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package no.nouish.flightcontrol;
+
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Locale;
+
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
+
+final class PdcUtil
+{
+  static void clearItemFrame(ItemFrame itemFrame)
+  {
+    itemFrame.getPersistentDataContainer().remove(FlightControlConstant.PLACED_BY);
+  }
+
+  static String getItemFramePlacedBy(ItemFrame itemFrame)
+  {
+    return itemFrame.getPersistentDataContainer().get(FlightControlConstant.PLACED_BY, PersistentDataType.STRING);
+  }
+
+  static void flagItemFrame(ItemFrame itemFrame, Player player)
+  {
+    itemFrame.getPersistentDataContainer()
+        .set(FlightControlConstant.PLACED_BY, PersistentDataType.STRING, player.getUniqueId().toString());
+  }
+
+  static LocalDateTime getPeriodStart(Player player)
+  {
+    long periodStartLong = player.getPersistentDataContainer()
+        .getOrDefault(FlightControlConstant.UNIX_PERIOD, PersistentDataType.LONG, (long) -1);
+    if (periodStartLong == -1)
+    {
+      return null;
+    }
+    Instant periodStart = Instant.ofEpochSecond(periodStartLong);
+    return LocalDateTime.ofInstant(periodStart, ZoneOffset.UTC);
+  }
+
+  static int getTotalCount(Player player)
+  {
+    return player.getPersistentDataContainer()
+        .getOrDefault(FlightControlConstant.COUNT_TOTAL, PersistentDataType.INTEGER, 0);
+  }
+
+  // Move these later, doesn't really belong here
+
+  private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+  static String getDisplayFormatUntil(LocalDateTime now, LocalDateTime when)
+  {
+    String wait;
+    Duration timeToWait = Duration.between(now, when);
+
+    if (timeToWait.toDays() >= 6)
+    {
+      wait = timeToWait.toDays() + " days";
+    }
+    else
+    {
+      wait = "until " + when.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+          + " at " + TIME_FORMATTER.format(when) + " UTC";
+    }
+
+    return "You must wait " + wait + " to take any more elytra";
+  }
+
+  static void sendAvailableInfo(Player player, boolean sendIfAvailable)
+  {
+    LocalDateTime start = getPeriodStart(player);
+    int available = getAvailableElytras(player);
+
+    if (start == null || available >= 1)
+    {
+      if (sendIfAvailable)
+      {
+        player.sendMessage(String.format(Locale.ENGLISH, "§aYou can still find %,d elytra.", available));
+      }
+      return;
+    }
+
+    LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
+    LocalDateTime when = start.plusHours(FlightControl.getInstance().getConfiguration().getPeriodHours());
+    player.sendMessage("§4" + getDisplayFormatUntil(now, when));
+  }
+
+  static int getAvailableElytras(Player player)
+  {
+    FlightControl flightControl = FlightControl.getInstance();
+    final int maxCount = flightControl.getConfiguration().getMaxCount();
+    final long periodHours = flightControl.getConfiguration().getPeriodHours();
+    LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
+
+    LocalDateTime start = PdcUtil.getPeriodStart(player);
+    if (start != null)
+    {
+      LocalDateTime when = start.plusHours(periodHours);
+
+      if (when.isBefore(now))
+      {
+        // Period expired
+        return maxCount;
+      }
+
+      int periodCount = player.getPersistentDataContainer()
+          .getOrDefault(FlightControlConstant.COUNT_PERIOD, PersistentDataType.INTEGER, 0);
+      return maxCount - periodCount;
+    }
+
+    return maxCount;
+  }
+
+  private PdcUtil() {}
+}

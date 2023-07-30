@@ -5,3 +5,13 @@ api-version: '${spigot.api.version}'
 main: 'no.nouish.flightcontrol.FlightControl'
 website: '${project.url}'
 author: 'nouish'
+
+commands:
+  flightcontrol:
+    description: 'Primary command for controlling FlightControl.'
+    usage: /<command> <params>
+
+permissions:
+  flightcontrol.reload:
+    description: 'Controls access to reloading configuration.'
+    default: op

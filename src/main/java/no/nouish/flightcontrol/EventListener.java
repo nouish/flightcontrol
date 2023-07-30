@@ -19,14 +19,11 @@
 package no.nouish.flightcontrol;
 
 import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,20 +39,18 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
-
-import lombok.extern.log4j.Log4j2;
-
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import lombok.extern.log4j.Log4j2;
+
 @Log4j2(topic = "FlightControl")
 final class EventListener implements Listener
 {
-  private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-
   private final FlightControl flightControl;
 
   EventListener(FlightControl flightControl)
@@ -105,13 +100,12 @@ final class EventListener implements Listener
 
   private void attemptToTakeElytra(Player player, ItemFrame itemFrame, Location location, Cancellable event)
   {
-    PersistentDataContainer itemFramePdc = itemFrame.getPersistentDataContainer();
-    String placedBy = itemFramePdc.get(FlightControlConstant.PLACED_BY, PersistentDataType.STRING);
-
-    if (placedBy != null)
+    // When a player places a plain elytra in an item frame in the end,
+    // we set a flag, whose presence indicates a non-natural item frame.
+    if (PdcUtil.getItemFramePlacedBy(itemFrame) != null)
     {
       // Not a naturally spawned elytra.
-      itemFramePdc.remove(FlightControlConstant.PLACED_BY);
+      PdcUtil.clearItemFrame(itemFrame);
       return;
     }
 
@@ -121,13 +115,11 @@ final class EventListener implements Listener
     int countInPeriod;
 
     PersistentDataContainer pdc = player.getPersistentDataContainer();
-    long periodStartLong = pdc.getOrDefault(FlightControlConstant.UNIX_PERIOD, PersistentDataType.LONG, (long) -1);
-    if (periodStartLong != -1)
+    LocalDateTime start = PdcUtil.getPeriodStart(player);
+    if (start != null)
     {
-      Instant periodStart = Instant.ofEpochSecond(periodStartLong);
-      LocalDateTime start = LocalDateTime.ofInstant(periodStart, ZoneOffset.UTC);
-      countInPeriod = pdc.getOrDefault(FlightControlConstant.COUNT_PERIOD, PersistentDataType.INTEGER, 0);
       LocalDateTime when = start.plusHours(periodHours);
+      countInPeriod = pdc.getOrDefault(FlightControlConstant.COUNT_PERIOD, PersistentDataType.INTEGER, 0);
 
       if (when.isBefore(now))
       {
@@ -139,21 +131,7 @@ final class EventListener implements Listener
       else if (countInPeriod >= flightControl.getConfiguration().getMaxCount())
       {
         event.setCancelled(true);
-
-        String wait;
-        Duration timeToWait = Duration.between(now, when);
-
-        if (timeToWait.toDays() >= 6)
-        {
-          wait = timeToWait.toDays() + " days";
-        }
-        else
-        {
-          wait = "until " + when.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
-              + " at " + TIME_FORMATTER.format(when) + " UTC";
-        }
-
-        player.sendMessage("§4You must wait " + wait + " to take any more elytra.");
+        player.sendMessage("§4" + PdcUtil.getDisplayFormatUntil(now, when));
         return;
       }
     }
@@ -219,8 +197,14 @@ final class EventListener implements Listener
       return;
     }
 
-    PersistentDataContainer pdc = itemFrame.getPersistentDataContainer();
-    pdc.set(FlightControlConstant.PLACED_BY, PersistentDataType.STRING, player.getUniqueId().toString());
+    PdcUtil.flagItemFrame(itemFrame, player);
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  void onPlayerJoin(PlayerJoinEvent event)
+  {
+    event.getPlayer().getServer().getScheduler().scheduleSyncDelayedTask(flightControl,
+        () -> PdcUtil.sendAvailableInfo(event.getPlayer(), false), 5);
   }
 
   private ItemFrame safeToItemFrame(Entity entity)
