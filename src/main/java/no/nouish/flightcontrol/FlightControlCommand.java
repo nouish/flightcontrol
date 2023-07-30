@@ -47,8 +47,6 @@ final class FlightControlCommand implements CommandExecutor, TabCompleter
   public boolean onCommand(
       @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args)
   {
-    LOGGER.info("{}, {}, {}, {}", sender, command, label, Arrays.toString(args));
-
     if (args.length >= 1 && "reload".equalsIgnoreCase(args[0]))
     {
       if (sender.hasPermission("flightcontrol.reload"))
