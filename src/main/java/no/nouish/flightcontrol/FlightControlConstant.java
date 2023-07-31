@@ -18,16 +18,11 @@
  */
 package no.nouish.flightcontrol;
 
-import java.util.UUID;
-
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
 final class FlightControlConstant
 {
-  // Temporary, only to be used on TorrentSMP
-  static final UUID DEVELOPER_UUID = UUID.fromString("fa8d60a7-9645-4a9f-b74d-173966174739");
-
   // Current time period stuff
 
   static final NamespacedKey UNIX_PERIOD = createNamespacedKey("unix_period");

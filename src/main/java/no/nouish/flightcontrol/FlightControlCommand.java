@@ -19,22 +19,20 @@
 package no.nouish.flightcontrol;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import lombok.extern.log4j.Log4j2;
-
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import lombok.extern.log4j.Log4j2;
+
 @Log4j2(topic = "FlightControl")
-final class FlightControlCommand implements CommandExecutor, TabCompleter
+final class FlightControlCommand implements TabExecutor
 {
   private final FlightControl flightControl;
 

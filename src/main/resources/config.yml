@@ -1,5 +1,7 @@
 # The hours (of duration) in which you are limited to `max-count` elytras.
+# Default: 168 (one week; 24 x 7)
 period-hours: 168
 
 # The maximum number of elytras players can obtain within `period-hours`.
+# Default: 2
 max-count: 2

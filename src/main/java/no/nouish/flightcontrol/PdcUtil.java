@@ -30,26 +30,30 @@ import java.util.Locale;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 final class PdcUtil
 {
-  static void clearItemFrame(ItemFrame itemFrame)
+  static void clearItemFrame(@NotNull ItemFrame itemFrame)
   {
     itemFrame.getPersistentDataContainer().remove(FlightControlConstant.PLACED_BY);
   }
 
-  static String getItemFramePlacedBy(ItemFrame itemFrame)
+  @Nullable
+  static String getItemFramePlacedBy(@NotNull ItemFrame itemFrame)
   {
     return itemFrame.getPersistentDataContainer().get(FlightControlConstant.PLACED_BY, PersistentDataType.STRING);
   }
 
-  static void flagItemFrame(ItemFrame itemFrame, Player player)
+  static void flagItemFrame(@NotNull ItemFrame itemFrame, @NotNull Player player)
   {
     itemFrame.getPersistentDataContainer()
         .set(FlightControlConstant.PLACED_BY, PersistentDataType.STRING, player.getUniqueId().toString());
   }
 
-  static LocalDateTime getPeriodStart(Player player)
+  @Nullable
+  static LocalDateTime getPeriodStart(@NotNull Player player)
   {
     long periodStartLong = player.getPersistentDataContainer()
         .getOrDefault(FlightControlConstant.UNIX_PERIOD, PersistentDataType.LONG, (long) -1);
@@ -61,7 +65,7 @@ final class PdcUtil
     return LocalDateTime.ofInstant(periodStart, ZoneOffset.UTC);
   }
 
-  static int getTotalCount(Player player)
+  static int getTotalCount(@NotNull Player player)
   {
     return player.getPersistentDataContainer()
         .getOrDefault(FlightControlConstant.COUNT_TOTAL, PersistentDataType.INTEGER, 0);
@@ -70,7 +74,9 @@ final class PdcUtil
   // Move these later, doesn't really belong here
 
   private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-  static String getDisplayFormatUntil(LocalDateTime now, LocalDateTime when)
+
+  @NotNull
+  static String getDisplayFormatUntil(@NotNull LocalDateTime now, @NotNull LocalDateTime when)
   {
     String wait;
     Duration timeToWait = Duration.between(now, when);
@@ -88,7 +94,7 @@ final class PdcUtil
     return "You must wait " + wait + " to take any more elytra";
   }
 
-  static void sendAvailableInfo(Player player, boolean sendIfAvailable)
+  static void sendAvailableInfo(@NotNull Player player, boolean sendIfAvailable)
   {
     LocalDateTime start = getPeriodStart(player);
     int available = getAvailableElytras(player);
@@ -107,7 +113,7 @@ final class PdcUtil
     player.sendMessage("§4" + getDisplayFormatUntil(now, when));
   }
 
-  static int getAvailableElytras(Player player)
+  static int getAvailableElytras(@NotNull Player player)
   {
     FlightControl flightControl = FlightControl.getInstance();
     final int maxCount = flightControl.getConfiguration().getMaxCount();

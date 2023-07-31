@@ -21,11 +21,13 @@ package no.nouish.flightcontrol;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import org.jetbrains.annotations.NotNull;
+
 final class Configuration
 {
   private final FlightControl flightControl;
 
-  Configuration(FlightControl flightControl)
+  Configuration(@NotNull FlightControl flightControl)
   {
     this.flightControl = Objects.requireNonNull(flightControl);
   }

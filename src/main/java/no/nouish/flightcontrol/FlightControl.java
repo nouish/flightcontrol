@@ -20,19 +20,19 @@ package no.nouish.flightcontrol;
 
 import java.io.File;
 
-import lombok.Getter;
-
-import lombok.extern.log4j.Log4j2;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.command.TabExecutor;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2(topic = "FlightControl")
 public final class FlightControl extends JavaPlugin
@@ -55,13 +55,20 @@ public final class FlightControl extends JavaPlugin
   @Override
   public void onEnable()
   {
-    PluginManager pluginManager = getServer().getPluginManager();
-    pluginManager.registerEvents(new EventListener(this), this);
+    registerEvents(new EventListener(this));
+    registerCommand("flightcontrol", new FlightControlCommand(this));
+  }
 
-    FlightControlCommand flightControlCommand = new FlightControlCommand(this);
-    PluginCommand pluginCommand = safeGetCommand("flightcontrol");
-    pluginCommand.setExecutor(flightControlCommand);
-    pluginCommand.setTabCompleter(flightControlCommand);
+  private void registerCommand(@NotNull String name, @NotNull TabExecutor executor)
+  {
+    PluginCommand command = safeGetCommand(name);
+    command.setExecutor(executor);
+    command.setTabCompleter(executor);
+  }
+
+  private void registerEvents(@NotNull Listener listener)
+  {
+    getServer().getPluginManager().registerEvents(listener, this);
   }
 
   @NotNull

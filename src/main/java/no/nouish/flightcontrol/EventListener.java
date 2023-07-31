@@ -44,6 +44,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -52,13 +53,13 @@ final class EventListener implements Listener
 {
   private final FlightControl flightControl;
 
-  EventListener(FlightControl flightControl)
+  EventListener(@NotNull FlightControl flightControl)
   {
     this.flightControl = Objects.requireNonNull(flightControl);
   }
 
   @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-  void onEntityDamageByEntity(EntityDamageByEntityEvent event)
+  void onEntityDamageByEntity(@NotNull EntityDamageByEntityEvent event)
   {
     Entity entity = event.getEntity();
     Location location = entity.getLocation();
@@ -158,7 +159,7 @@ final class EventListener implements Listener
   }
 
   @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-  void onHangingBreak(HangingBreakEvent event)
+  void onHangingBreak(@NotNull HangingBreakEvent event)
   {
     Entity entity = event.getEntity();
     Location location = entity.getLocation();
@@ -180,7 +181,7 @@ final class EventListener implements Listener
   }
 
   @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-  void onPlayerInteractEntity(PlayerInteractEntityEvent event)
+  void onPlayerInteractEntity(@NotNull PlayerInteractEntityEvent event)
   {
     Location location = event.getRightClicked().getLocation();
     if (!isInTheEnd(location))
@@ -206,7 +207,7 @@ final class EventListener implements Listener
   }
 
   @EventHandler(priority = EventPriority.NORMAL)
-  void onPlayerJoin(PlayerJoinEvent event)
+  void onPlayerJoin(@NotNull PlayerJoinEvent event)
   {
     event.getPlayer().getServer().getScheduler().scheduleSyncDelayedTask(flightControl,
         () -> PdcUtil.sendAvailableInfo(event.getPlayer(), false), 5);
