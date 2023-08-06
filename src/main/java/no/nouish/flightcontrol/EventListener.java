@@ -18,7 +18,6 @@
  */
 package no.nouish.flightcontrol;
 
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Locale;
@@ -45,6 +44,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -111,7 +111,7 @@ final class EventListener implements Listener
 
     final int maxCount = flightControl.getConfiguration().getMaxCount();
     final long periodHours = flightControl.getConfiguration().getPeriodHours();
-    LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
+    LocalDateTime now = TimeUtil.getCurrentUtcDateTime();
     int countInPeriod;
 
     PersistentDataContainer pdc = player.getPersistentDataContainer();
@@ -131,7 +131,7 @@ final class EventListener implements Listener
       else if (countInPeriod >= flightControl.getConfiguration().getMaxCount())
       {
         event.setCancelled(true);
-        player.sendMessage("§4" + PdcUtil.getDisplayFormatUntil(now, when));
+        player.sendMessage("§4" + TimeUtil.getDisplayFormatUntil(now, when));
         return;
       }
     }
@@ -213,7 +213,8 @@ final class EventListener implements Listener
         () -> PdcUtil.sendAvailableInfo(event.getPlayer(), false), 5);
   }
 
-  private ItemFrame safeToItemFrame(Entity entity)
+  @Nullable
+  private ItemFrame safeToItemFrame(@NotNull Entity entity)
   {
     // End ships only ever have regular item frames, not glowing ones.
     if (entity.getType() != EntityType.ITEM_FRAME)
@@ -229,7 +230,7 @@ final class EventListener implements Listener
     return null;
   }
 
-  private boolean isNaturalSpawnedElytra(ItemStack item)
+  private boolean isNaturalSpawnedElytra(@NotNull ItemStack item)
   {
     if (item.getType() != Material.ELYTRA)
     {
@@ -245,7 +246,7 @@ final class EventListener implements Listener
     return !meta.hasEnchants() && !meta.hasLore() && !meta.hasDisplayName();
   }
 
-  private boolean isInTheEnd(Location location)
+  private boolean isInTheEnd(@NotNull Location location)
   {
     World world = location.getWorld();
     return world != null && world.getEnvironment() == World.Environment.THE_END;

@@ -39,7 +39,7 @@ public final class FlightControl extends JavaPlugin
 {
   static FlightControl getInstance()
   {
-    return (FlightControl) FlightControl.getProvidingPlugin(FlightControl.class);
+    return getPlugin(FlightControl.class);
   }
 
   @Getter

@@ -18,13 +18,9 @@
  */
 package no.nouish.flightcontrol;
 
-import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
 import java.util.Locale;
 
 import org.bukkit.entity.ItemFrame;
@@ -71,29 +67,6 @@ final class PdcUtil
         .getOrDefault(FlightControlConstant.COUNT_TOTAL, PersistentDataType.INTEGER, 0);
   }
 
-  // Move these later, doesn't really belong here
-
-  private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-
-  @NotNull
-  static String getDisplayFormatUntil(@NotNull LocalDateTime now, @NotNull LocalDateTime when)
-  {
-    String wait;
-    Duration timeToWait = Duration.between(now, when);
-
-    if (timeToWait.toDays() >= 6)
-    {
-      wait = timeToWait.toDays() + " days";
-    }
-    else
-    {
-      wait = "until " + when.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
-          + " at " + TIME_FORMATTER.format(when) + " UTC";
-    }
-
-    return "You must wait " + wait + " to take any more elytra";
-  }
-
   static void sendAvailableInfo(@NotNull Player player, boolean sendIfAvailable)
   {
     LocalDateTime start = getPeriodStart(player);
@@ -108,9 +81,9 @@ final class PdcUtil
       return;
     }
 
-    LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
+    LocalDateTime now = TimeUtil.getCurrentUtcDateTime();
     LocalDateTime when = start.plusHours(FlightControl.getInstance().getConfiguration().getPeriodHours());
-    player.sendMessage("§4" + getDisplayFormatUntil(now, when));
+    player.sendMessage("§4" + TimeUtil.getDisplayFormatUntil(now, when));
   }
 
   static int getAvailableElytras(@NotNull Player player)
@@ -118,7 +91,7 @@ final class PdcUtil
     FlightControl flightControl = FlightControl.getInstance();
     final int maxCount = flightControl.getConfiguration().getMaxCount();
     final long periodHours = flightControl.getConfiguration().getPeriodHours();
-    LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
+    LocalDateTime now = TimeUtil.getCurrentUtcDateTime();
 
     LocalDateTime start = PdcUtil.getPeriodStart(player);
     if (start != null)
