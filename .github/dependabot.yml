@@ -1,12 +1,37 @@
 version: 2
 
+registries:
+  maven-central:
+    type: "maven-repository"
+    url: "https://repo.maven.apache.org/maven2"
+  spigotmc-repository:
+    type: "maven-repository"
+    url: "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
+
 updates:
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "weekly"
+    registries:
+      - "maven-central"
+      - "spigotmc-repository"
+    groups:
+      maven-plugin:
+        patterns:
+          - "org.apache.maven.plugins:*"
+    ignore:
+      # Using log4j version provided by Minecraft.
+      - dependency-name: "org.apache.logging.log4j:log4j-core"
+    open-pull-requests-limit: 8
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      github-actions:
+        update-types:
+          - "major"
+        patterns:
+          - "*"
