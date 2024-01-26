@@ -10,16 +10,19 @@ jobs:
   verify:
     name: Maven Build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ 17, 21 ]
 
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
 
-      - name: Setup JDK
+      - name: Setup JDK ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: ${{ matrix.java }}
           cache: maven
 
       - name: Build with Maven
@@ -30,6 +33,7 @@ jobs:
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
+        if: matrix.java == 17
         with:
           name: ${{ env.artifactName }}
           path: |

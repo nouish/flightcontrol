@@ -104,9 +104,6 @@
           <source>17</source>
           <target>17</target>
           <release>17</release>
-          <compilerArgs>
-            <arg>-proc:full</arg>
-          </compilerArgs>
         </configuration>
       </plugin>
     </plugins>
@@ -141,4 +138,26 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>jdk21-or-newer</id>
+      <activation>
+        <jdk>[21,)</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <compilerArgs>
+                <arg>-proc:full</arg>
+              </compilerArgs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
