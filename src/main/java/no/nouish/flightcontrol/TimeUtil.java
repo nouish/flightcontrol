@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.jetbrains.annotations.NotNull;
 
 final class TimeUtil
@@ -46,12 +47,13 @@ final class TimeUtil
 
     if (timeToWait.toDays() >= 6)
     {
-      wait = timeToWait.toDays() + " days";
+      wait = DurationFormatUtils.formatDurationWords(timeToWait.toMillis(), true, true);
     }
     else
     {
       wait = "until " + when.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
-          + " at " + TIME_FORMATTER.format(when) + " UTC";
+          + " at " + TIME_FORMATTER.format(when) + " UTC ("
+          + DurationFormatUtils.formatDuration(timeToWait.toMillis(), "HH'h' mm'm' ss's'", true) + ")";
     }
 
     return "You must wait " + wait + " to take any more elytra";
