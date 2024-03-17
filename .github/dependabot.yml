@@ -21,8 +21,10 @@ updates:
         patterns:
           - "org.apache.maven.plugins:*"
     ignore:
-      # Using log4j version provided by Minecraft.
+      # Keep in sync with Minecraft provided version
       - dependency-name: "org.apache.logging.log4j:log4j-core"
+      # Keep in sync with CraftBukkit provided version
+      - dependency-name: "org.apache.commons:commons-lang3"
     open-pull-requests-limit: 8
 
   - package-ecosystem: "github-actions"
