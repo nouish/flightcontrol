@@ -32,3 +32,6 @@ target/
 
 # VS Code
 .vscode/
+
+# Maven versions backup
+pom.xml.versionsBackup
