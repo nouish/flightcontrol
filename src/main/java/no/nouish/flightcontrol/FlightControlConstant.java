@@ -23,6 +23,9 @@ import org.jetbrains.annotations.NotNull;
 
 final class FlightControlConstant
 {
+  // https://bstats.org/plugin/bukkit/Elytra%20FlightControl/22970
+  static final int BSTATS_PLUGIN_ID = 22970;
+
   // Current time period stuff
 
   static final NamespacedKey UNIX_PERIOD = createNamespacedKey("unix_period");

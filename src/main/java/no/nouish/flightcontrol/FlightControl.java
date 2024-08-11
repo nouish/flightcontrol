@@ -25,8 +25,11 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -57,6 +60,25 @@ public final class FlightControl extends JavaPlugin
   {
     registerEvents(new EventListener(this));
     registerCommand("flightcontrol", new FlightControlCommand(this));
+    registerMetrics();
+  }
+
+  private void registerMetrics()
+  {
+    Metrics metrics = new Metrics(this, FlightControlConstant.BSTATS_PLUGIN_ID);
+    metrics.addCustomChart(new SimplePie("periodHours", () -> String.valueOf(configuration.getPeriodHours())));
+    metrics.addCustomChart(new SimplePie("periodMaxCount", () -> String.valueOf(configuration.getMaxCount())));
+
+    // Let the server operator know FlightControl uses bstats.
+
+    File bStatsFolder = new File(getDataFolder().getParentFile(), "bStats");
+    File configFile = new File(bStatsFolder, "config.yml");
+    YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+
+    if (config.isSet("enabled") && config.getBoolean("enabled"))
+    {
+      LOGGER.info("Bstats metrics enabled.");
+    }
   }
 
   private void registerCommand(@NotNull String name, @NotNull TabExecutor executor)
