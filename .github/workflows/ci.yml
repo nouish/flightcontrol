@@ -8,7 +8,7 @@ on:
 
 jobs:
   verify:
-    name: Maven Build
+    name: Build with Maven
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -27,15 +27,15 @@ jobs:
 
       - name: Build with Maven
         run: |
-          mvn --version
-          mvn --batch-mode --no-transfer-progress package
-          echo "artifactName=$(mvn help:evaluate -Dexpression=project.build.finalName -q -DforceStdout)" >> $GITHUB_ENV
+          ./mvnw --version
+          ./mvnw --batch-mode --no-transfer-progress package
+          echo "artifact=$(./mvnw help:evaluate -Dexpression=project.build.finalName -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         if: matrix.java == 21
         with:
-          name: ${{ env.artifactName }}
+          name: ${{ env.artifact }}
           path: |
             target/*.jar
             !target/original-*.jar
