@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ 21, 22 ]
+        java: [ 21, 23 ]
 
     steps:
       - name: Git checkout
@@ -25,10 +25,12 @@ jobs:
           java-version: ${{ matrix.java }}
           cache: maven
 
+      - name: Set up Maven Wrapper
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=3.9.9"
+
       - name: Build with Maven
         run: |
-          ./mvnw --version
-          ./mvnw --batch-mode --no-transfer-progress package
+          ./mvnw clean package --batch-mode --no-transfer-progress --show-version
           echo "artifact=$(./mvnw help:evaluate -Dexpression=project.build.finalName -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Upload Artifacts
