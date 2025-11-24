@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Git checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup JDK ${{ matrix.java }}
         uses: actions/setup-java@v5
@@ -34,7 +34,7 @@ jobs:
           echo "artifact=$(./mvnw help:evaluate -Dexpression=project.build.finalName -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: matrix.java == 21
         with:
           name: ${{ env.artifact }}
